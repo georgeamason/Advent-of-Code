@@ -2,35 +2,37 @@
 
 using var streamReader = new StreamReader("input.txt");
 
-var calorieCounter = new List<int>();
+var unorderedElfCalories = new List<int>();
 
 while (!streamReader.EndOfStream)
 {
-    var totalCalories = 0;
+    var elfCalories = 0;
     while (true)
     {
         var calories = streamReader.ReadLine();
         if (string.IsNullOrWhiteSpace(calories))
             break;
 
-        totalCalories += int.Parse(calories);
+        elfCalories += int.Parse(calories);
     }
 
-    calorieCounter.Add(totalCalories); 
+    unorderedElfCalories.Add(elfCalories); 
 }
 
-var ordered = calorieCounter.OrderByDescending(i => i).ToArray();
-var max = ordered[0];
-var elf = calorieCounter.IndexOf(max);
-Console.WriteLine($"Elf {elf} is carrying {max} calories! Talk to him for snacks!");
+var orderedElfCalories = unorderedElfCalories.OrderByDescending(i => i).ToArray();
 
-var topThree = ordered.Take(3).Sum();
-
-int IndexOf(int index)
+int ElfFinder(int calories)
 {
-    return calorieCounter.IndexOf(ordered[index]);
+    return unorderedElfCalories.IndexOf(calories);
 }
 
-Console.WriteLine($"The top three Elves are {IndexOf(0)}, " +
-                  $"{IndexOf(1)}, {IndexOf(2)} " +
-                  $"carrying a total of {topThree} calories");
+
+Console.WriteLine($"|{"Elf",5}|{"Calories",10}|{"Cumulative", 15}|");
+Console.WriteLine($"|-----|----------|---------------|");
+
+var cumulative = 0;
+foreach (var elfCalories in orderedElfCalories)
+{
+    cumulative += elfCalories;
+    Console.WriteLine($"|{ElfFinder(elfCalories),5}|{elfCalories,10}|{cumulative, 15}|");
+}
