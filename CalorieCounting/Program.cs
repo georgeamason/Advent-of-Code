@@ -19,12 +19,18 @@ while (!streamReader.EndOfStream)
     calorieCounter.Add(totalCalories); 
 }
 
-var max = calorieCounter.Max();
+var ordered = calorieCounter.OrderByDescending(i => i).ToArray();
+var max = ordered[0];
 var elf = calorieCounter.IndexOf(max);
 Console.WriteLine($"Elf {elf} is carrying {max} calories! Talk to him for snacks!");
 
-var topThree = calorieCounter.OrderByDescending(i => i)
-                             .Take(3)
-                             .Sum();
+var topThree = ordered.Take(3).Sum();
 
-Console.WriteLine($"The top three Elves are carrying a total of {topThree} calories");
+int IndexOf(int index)
+{
+    return calorieCounter.IndexOf(ordered[index]);
+}
+
+Console.WriteLine($"The top three Elves are {IndexOf(0)}, " +
+                  $"{IndexOf(1)}, {IndexOf(2)} " +
+                  $"carrying a total of {topThree} calories");
