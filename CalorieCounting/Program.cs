@@ -22,3 +22,9 @@ while (!streamReader.EndOfStream)
 var max = calorieCounter.Max();
 var elf = calorieCounter.IndexOf(max);
 Console.WriteLine($"Elf {elf} is carrying {max} calories! Talk to him for snacks!");
+
+var topThree = calorieCounter.OrderByDescending(i => i)
+                             .Take(3)
+                             .Sum();
+
+Console.WriteLine($"The top three Elves are carrying a total of {topThree} calories");
