@@ -18,28 +18,32 @@ internal static class Program
             var foe = new Shape(x[0]);
             var friendly = new Shape(x[1]);
 
-            var roundScore = BattleEngine(foe.Sign, friendly.Sign);
-            totalScore += roundScore + friendly.Score;
+            var result = BattleEngine(foe.Sign, friendly.Sign);
+
+            totalScore += result switch
+            {
+                Result.Win => friendly.Score + 6,
+                Result.Draw => friendly.Score + 3,
+                Result.Loss => friendly.Score,
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         Console.WriteLine(totalScore);
     }
 
-    private static int BattleEngine(Sign foe, Sign friendly)
+    private static Result BattleEngine(Sign foe, Sign friendly)
     {
         if (foe == friendly)
-            return 3;
+            return Result.Draw;
 
-        if (foe is Sign.Rock)
-            return friendly is Sign.Paper ? 6 : 0;
-
-        if (foe is Sign.Paper)
-            return friendly is Sign.Scissors ? 6 : 0;
-
-        if (foe is Sign.Scissors)
-            return friendly is Sign.Rock ? 6 : 0;
-
-        throw new Exception();
+        return foe switch
+        {
+            Sign.Rock => friendly is Sign.Paper ? Result.Win : Result.Loss,
+            Sign.Paper => friendly is Sign.Scissors ? Result.Win : Result.Loss,
+            Sign.Scissors => friendly is Sign.Rock ? Result.Win : Result.Loss,
+            _ => throw new Exception()
+        };
     }
 
     private sealed class Shape
@@ -70,6 +74,13 @@ internal static class Program
         };
 
         private readonly char _input;
+    }
+
+    private enum Result
+    {
+        Win,
+        Draw,
+        Loss
     }
 
     private enum Sign
