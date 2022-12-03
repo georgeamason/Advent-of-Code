@@ -13,36 +13,78 @@ internal static class Program
         {
             var round = streamReader.ReadLine();
 
-            var x = round!.Split(' ');
+            var plays = round!.Split(' ');
 
-            var foe = new Shape(x[0]);
-            var friendly = new Shape(x[1]);
-
-            var result = BattleEngine(foe.Sign, friendly.Sign);
-
-            totalScore += result switch
-            {
-                Result.Win => friendly.Score + 6,
-                Result.Draw => friendly.Score + 3,
-                Result.Loss => friendly.Score,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            totalScore += Part2(plays);
         }
 
         Console.WriteLine(totalScore);
     }
 
-    private static Result BattleEngine(Sign foe, Sign friendly)
+    private static int Part1(IReadOnlyList<string> plays)
+    {
+        var foe = new Shape(plays[0]);
+        var friendly = new Shape(plays[1]);
+
+        var result = BattleEngine(foe.Sign, friendly.Sign);
+
+        return result switch
+        {
+            Outcome.Win => friendly.Score + 6,
+            Outcome.Draw => friendly.Score + 3,
+            Outcome.Loss => friendly.Score,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    private static int Part2(IReadOnlyList<string> plays)
+    {
+        var foe = new Shape(plays[0]);
+
+        var expectedOutcome = new Shape(plays[1]).Sign switch
+        {
+            Sign.Rock => Outcome.Loss,
+            Sign.Paper => Outcome.Draw,
+            Sign.Scissors => Outcome.Win,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        var friendly = BattleEngine(foe.Sign, expectedOutcome);
+
+        return friendly switch
+        {
+            Sign.Rock => 1 + (int) expectedOutcome,
+            Sign.Paper => 2 + (int) expectedOutcome,
+            Sign.Scissors => 3 + (int) expectedOutcome,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    private static Outcome BattleEngine(Sign foe, Sign friendly)
     {
         if (foe == friendly)
-            return Result.Draw;
+            return Outcome.Draw;
 
         return foe switch
         {
-            Sign.Rock => friendly is Sign.Paper ? Result.Win : Result.Loss,
-            Sign.Paper => friendly is Sign.Scissors ? Result.Win : Result.Loss,
-            Sign.Scissors => friendly is Sign.Rock ? Result.Win : Result.Loss,
-            _ => throw new Exception()
+            Sign.Rock => friendly is Sign.Paper ? Outcome.Win : Outcome.Loss,
+            Sign.Paper => friendly is Sign.Scissors ? Outcome.Win : Outcome.Loss,
+            Sign.Scissors => friendly is Sign.Rock ? Outcome.Win : Outcome.Loss,
+            _ => throw new ArgumentOutOfRangeException(nameof(foe))
+        };
+    }
+
+    private static Sign BattleEngine(Sign foe, Outcome outcome)
+    {
+        if (outcome == Outcome.Draw)
+            return foe;
+
+        return foe switch
+        {
+            Sign.Rock => outcome is Outcome.Win ? Sign.Paper : Sign.Scissors,
+            Sign.Paper => outcome is Outcome.Win ? Sign.Scissors : Sign.Rock,
+            Sign.Scissors => outcome is Outcome.Win ? Sign.Rock : Sign.Paper,
+            _ => throw new ArgumentOutOfRangeException(nameof(foe))
         };
     }
 
@@ -76,11 +118,11 @@ internal static class Program
         private readonly char _input;
     }
 
-    private enum Result
+    private enum Outcome
     {
-        Win,
-        Draw,
-        Loss
+        Win = 6,
+        Draw = 3,
+        Loss = 0
     }
 
     private enum Sign
