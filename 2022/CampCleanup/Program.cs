@@ -2,7 +2,8 @@
 
 using var sr = new StreamReader("input.txt");
 
-var count = 0;
+var engulfs = 0;
+var overlaps = 0;
 while (!sr.EndOfStream)
 {
     var line = sr.ReadLine();
@@ -16,17 +17,27 @@ while (!sr.EndOfStream)
         
         return Enumerable.Range(start, end - start + 1).ToArray();
     }
-
-    bool Engulfs(IReadOnlyList<int> datum, IReadOnlyList<int> spec)
-    {
-        return (datum[0] <= spec[0] && datum[^1] >= spec[^1])
-               || (spec[0] <= datum[0] && spec[^1] >= datum[^1]);
-    }
-
+    
     var x = ElfRange(0);
     var y = ElfRange(1);
-    if (Engulfs(x, y))
-        count++;
+    
+    bool Engulfs()
+    {
+        return (x[0] <= y[0] && x[^1] >= y[^1])
+               || (y[0] <= x[0] && y[^1] >= x[^1]);
+    }
+
+    bool Overlaps()
+    {
+        return x!.Intersect(y!).Any();
+    }
+
+    if (Engulfs()) 
+        engulfs++;
+
+    if (Overlaps())
+        overlaps++;
 }
 
-Console.WriteLine(count);
+Console.WriteLine(engulfs);
+Console.WriteLine(overlaps);
