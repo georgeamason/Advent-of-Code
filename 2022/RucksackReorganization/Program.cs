@@ -6,6 +6,12 @@ internal static class Program
 {
     private static void Main()
     {
+        Part1();
+        Part2();
+    }
+
+    private static void Part1()
+    {
         using var streamReader = new StreamReader("input.txt");
 
         var totalPriorityError = 0;
@@ -25,82 +31,31 @@ internal static class Program
 
             totalPriorityError += error.Priority;
         }
-        
+
         Console.WriteLine(totalPriorityError);
     }
 
-    private sealed class Rucksack
+    private static void Part2()
     {
-        internal Rucksack(string contents)
+        var groups = File.ReadAllLines("input.txt")
+                         .Chunk(3)
+                         .ToList();
+
+        var totalPriorityError = 0;
+        foreach (var group in groups)
         {
-            _contents = contents ?? throw new ArgumentNullException(nameof(contents));
+            var pack1 = new Rucksack(group[0]).Items;
+            var pack2 = new Rucksack(group[1]).Items;
+            var pack3 = new Rucksack(group[2]).Items;
+
+            var error = pack1.Intersect(pack2)
+                          .Intersect(pack3)
+                          .Single();
+
+            totalPriorityError += error.Priority;
         }
 
-        private int Length => _contents.Length;
-
-        public IReadOnlyList<Compartment> Compartments
-        {
-            get
-            {
-                return new[]
-                {
-                    new Compartment(_contents[..(Length / 2)]),
-                    new Compartment(_contents[(Length / 2)..])
-                };
-            }
-        }
-
-        private readonly string _contents;
-    }
-
-    private sealed class Compartment
-    {
-        internal Compartment(string contents)
-        {
-            _contents = contents ?? throw new ArgumentNullException(nameof(contents));
-        }
-
-        public IReadOnlyCollection<Item> Items
-        {
-            get
-            {
-                return _contents.Select(item => new Item(item)).ToList();
-            }
-        }
-
-        private readonly string _contents;
-    }
-
-    private sealed class Item : IEquatable<Item>
-    {
-        internal Item(char item)
-        {
-            Type = item;
-        }
-
-        public readonly char Type;
-        
-        public int Priority => Alphabet.IndexOf(Type) + 1;
-
-        public bool Equals(Item? other)
-        {
-            if (other is null)
-                return false;
-
-            return this.Type == other.Type;
-        }
-
-        private const string Alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-        public override bool Equals(object? obj)
-        {
-            return Equals(obj as Item);
-        }
-
-        public override int GetHashCode()
-        {
-            return Type.GetHashCode();
-        }
+        Console.WriteLine(totalPriorityError);
     }
 }
 
