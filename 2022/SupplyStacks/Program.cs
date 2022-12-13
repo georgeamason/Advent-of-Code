@@ -1,35 +1,55 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Collections;
 using System.Text.RegularExpressions;
 
-var stacks = new List<Stack<char>>();
 using var sr = new StreamReader("input.txt");
+var stacks = new List<Stack<char>>();
 
+string? line;
+while ((line = sr.ReadLine()) != null && line.Contains('['))
+{
+    var crates = line.Chunk(4).Select(crate => new String(crate));
+
+    var i = 0;
+    foreach (var crate in crates)
+    {
+        if (stacks.Count < i + 1)
+            stacks.Add(new Stack<char>());
+
+        if (char.TryParse(Regex.Match(crate!, "\\w").Value, out var item))
+            stacks[i].Push(item);
+
+        i++;
+    }
+}
+
+// reverse the stacks
+stacks = stacks.Select(stack => new Stack<char>(stack)).ToList();
+
+// Process the crane movement
 while (!sr.EndOfStream)
 {
-    var line = sr.ReadLine();
+    line = sr.ReadLine();
 
-    if (!string.IsNullOrEmpty(line) && !line.StartsWith(" "))
+    if (line!.StartsWith("move"))
     {
-        var crates = line.Chunk(4).Select(crate => new String(crate));
+        var craneOperation = line!.Split(" ");
 
-        var i = 0;
-        foreach (var crate in crates)
+        for (int i = 0; i < int.Parse(craneOperation[1]); i++)
         {
-            if (stacks.Count < i + 1)
-                stacks.Add(new Stack<char>());
-
-            if (char.TryParse(Regex.Match(crate!, "\\w").Value, out var item))
-                stacks[i].Push(item);
-
-            i++;
+            var popped = stacks[int.Parse(craneOperation[3]) - 1].Pop();
+            stacks[int.Parse(craneOperation[5]) - 1].Push(popped);
         }
     }
-    else
-    {
-        var x = 1;
-        // process to movement with crane        
-    }
-    
 }
+
+var result = string.Empty;
+foreach (var stack in stacks)
+{
+    if (stack.TryPeek(out var top))
+    {
+        result += top;
+    }
+}
+
+Console.WriteLine(result);
