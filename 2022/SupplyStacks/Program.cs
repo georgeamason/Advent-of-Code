@@ -5,10 +5,11 @@ using System.Text.RegularExpressions;
 using var sr = new StreamReader("input.txt");
 var stacks = new List<Stack<char>>();
 
+// Build the stack
 string? line;
 while ((line = sr.ReadLine()) != null && line.Contains('['))
 {
-    var crates = line.Chunk(4).Select(crate => new String(crate));
+    var crates = line.Chunk(4).Select(crate => new string(crate));
 
     var i = 0;
     foreach (var crate in crates)
@@ -24,7 +25,7 @@ while ((line = sr.ReadLine()) != null && line.Contains('['))
 }
 
 // reverse the stacks
-stacks = stacks.Select(stack => new Stack<char>(stack)).ToList();
+stacks = stacks.Select(s => new Stack<char>(s)).ToList();
 
 // Process the crane movement
 while (!sr.EndOfStream)
@@ -35,7 +36,7 @@ while (!sr.EndOfStream)
     {
         var craneOperation = line!.Split(" ");
 
-        for (int i = 0; i < int.Parse(craneOperation[1]); i++)
+        for (var i = 0; i < int.Parse(craneOperation[1]); i++)
         {
             var popped = stacks[int.Parse(craneOperation[3]) - 1].Pop();
             stacks[int.Parse(craneOperation[5]) - 1].Push(popped);
