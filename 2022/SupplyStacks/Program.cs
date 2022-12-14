@@ -2,6 +2,9 @@
 
 using System.Text.RegularExpressions;
 
+Console.Write("CrateMover (9000/9001): ");
+var crane = int.Parse(Console.ReadLine()!);
+
 using var sr = new StreamReader("input.txt");
 var stacks = new List<Stack<char>>();
 
@@ -35,11 +38,20 @@ while (!sr.EndOfStream)
     if (line!.StartsWith("move"))
     {
         var craneOperation = line!.Split(" ");
-
-        for (var i = 0; i < int.Parse(craneOperation[1]); i++)
+        var move = int.Parse(craneOperation[1]);
+        var from = int.Parse(craneOperation[3]);
+        var to = int.Parse(craneOperation[5]);
+        
+        switch (crane)
         {
-            var popped = stacks[int.Parse(craneOperation[3]) - 1].Pop();
-            stacks[int.Parse(craneOperation[5]) - 1].Push(popped);
+            case 9000:
+                for (var i = 0; i < move; i++) stacks[to - 1].Push(stacks[from - 1].Pop());
+                break;
+            case 9001:
+                var popped = stacks[from - 1].Take(move).Reverse().ToList();
+                for (var i = 0; i < move; i++) stacks[from - 1].Pop();
+                popped.ForEach(x => stacks[to - 1].Push(x));
+                break;
         }
     }
 }
