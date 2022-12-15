@@ -2,44 +2,40 @@ namespace TuningTrouble;
 
 public class Tests
 {
-    // The start of a packet is indicated by a sequence of four characters that are all different.
-
-    [Test]
-    public void Example1()
+    [TestCase("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 4,  7)]
+    [TestCase("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 14, 19)]
+    [TestCase("bvwbjplbgvbhsrlpgdmjqwftvncz", 4, 5)]
+    public void Compute_marker_calculates_marker_correctly
+        (string input, int distinctCharacters, int result)
     {
-        Assert.That(() => ComputeMarker("mjqjpqmgbljsphdztnvjfqwrcgsmlb"), Is.EqualTo(7));
-    }
-    
-    [Test]
-    public void Example2()
-    {
-        Assert.That(() => ComputeMarker("bvwbjplbgvbhsrlpgdmjqwftvncz"), Is.EqualTo(5));
+        Assert.That(() => ComputeMarker(input, distinctCharacters), Is.EqualTo(result));
     }
 
-    [Test]
-    public void Part1()
+    [TestCase(4)]
+    [TestCase(14)]
+    public void Program(int distinctCharacters)
     {
         var dataStream = File.ReadAllText("input.txt");
         
-        Assert.That(() =>
-        {
-            var marker = ComputeMarker(dataStream);
-            Console.WriteLine(marker);
-            return marker;
-        }, Is.InstanceOf<int>());
+        Assert.That(() => ComputeMarker(dataStream, distinctCharacters), Is.InstanceOf<int>());
     }
 
-    private static int ComputeMarker(string dataStream)
+    private static int ComputeMarker(string dataStream, int distinctCharacters = 4)
     {
         for (var i = 0; i < dataStream.Length; i++)
         {
-            if (dataStream.Length < i + 4)
+            var index = i + distinctCharacters;
+
+            if (dataStream.Length < index)
                 throw new IndexOutOfRangeException("No marker found!");
-                
-            if (dataStream[new Range(i, i + 4)].Distinct().Count() is 4)
-                return i + 4;
+
+            if (dataStream[new Range(i, index)].Distinct().Count() == distinctCharacters)
+            {
+                Console.WriteLine(index);
+                return index;
+            }
         }
 
-        throw new ArgumentException();
+        throw new ArgumentException("No marker found!");
     }
 }
