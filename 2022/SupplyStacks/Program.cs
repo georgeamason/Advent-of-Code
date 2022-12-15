@@ -48,9 +48,9 @@ while (!sr.EndOfStream)
                 for (var i = 0; i < move; i++) stacks[to - 1].Push(stacks[from - 1].Pop());
                 break;
             case 9001:
-                var popped = stacks[from - 1].Take(move).Reverse().ToList();
-                for (var i = 0; i < move; i++) stacks[from - 1].Pop();
-                popped.ForEach(x => stacks[to - 1].Push(x));
+                var popped = new char[move];
+                for (var i = 0; i < move; i++) popped[i] = stacks[from - 1].Pop();
+                popped.Reverse().ToList().ForEach(x => stacks[to - 1].Push(x));
                 break;
         }
     }
