@@ -5,38 +5,50 @@ namespace NoSpaceLeftOnDevice;
 
 internal class Directory : IFilesystem
 {
-    public Directory(string name, string[] commands)
+    public Directory(string name, Directory? parentDirectory)
     {
-        _commands = commands;
         Name = name;
+        ParentDirectory = parentDirectory;
     }
 
-    public int Size => Contents.Sum(c => c.Size);
+    public int Size => Content.Sum(f => f.Size);
 
     public string Name { get; }
 
-    public IEnumerable<Directory> Directories => Contents.OfType<Directory>().ToList();
+    public Directory? ParentDirectory { get; }
 
-    public IEnumerable<File> Files => Contents.OfType<File>().ToList();
+    public IList<IFilesystem> Content { get; } = new List<IFilesystem>();
 
-    private IEnumerable<IFilesystem> Contents
+    public IEnumerable<Directory> Directories => Content.OfType<Directory>();
+
+    public IEnumerable<File> Files => Content.OfType<File>();
+
+    public override string ToString()
     {
-        get
+        static int Indentation(Directory? directory, int indentation = 0)
         {
-            foreach (var cmd in _commands)
+            if (directory is null)
+                return indentation;
+
+            return Indentation(directory.ParentDirectory, indentation + 1);
+        }
+
+        var indentation = Indentation(ParentDirectory);
+        var print = $"{new string("-").PadLeft(indentation*3, ' ')} {Name} (dir, size={Size})";
+        foreach (var c in Content.OrderBy(c => c.Name))
+        {
+            print += Environment.NewLine;
+            switch (c)
             {
-                if (cmd.StartsWith("dir"))
-                {
-                    //yield return Task.Factory.StartNew(() => Test(_commands, cmd)).Result;
-                }
-                else if (int.TryParse(cmd.Split(" ")[0], out var size))
-                {
-                    var filename = cmd.Split(" ")[1];
-                    yield return new File(filename, size);
-                }
+                case Directory directory:
+                    print += directory.ToString();
+                    break;
+                case File file:
+                    print += $"{new string("-").PadLeft((indentation+1)*3, ' ')} {file.Name} (file, size={file.Size})";
+                    break;
             }
         }
-    }
 
-    private readonly string[] _commands;
+        return print;
+    }
 }

@@ -2,13 +2,13 @@
 
 internal class File : IFilesystem
 {
-    public File(string filename, int size)
+    public File(string name, int size)
     {
-        Filename = filename;
+        Name = name;
         Size = size;
     }
 
-    private string Filename { get; }
+    public string Name { get; }
 
     public int Size { get; }
 }
