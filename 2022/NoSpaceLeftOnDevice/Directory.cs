@@ -27,14 +27,17 @@ internal class Directory : IFilesystem
     {
         static int Indentation(Directory? directory, int indentation = 0)
         {
-            if (directory is null)
-                return indentation;
+            while (true)
+            {
+                if (directory is null) return indentation;
 
-            return Indentation(directory.ParentDirectory, indentation + 1);
+                directory = directory.ParentDirectory;
+                indentation += 1;
+            }
         }
 
         var indentation = Indentation(ParentDirectory);
-        var print = $"{new string("-").PadLeft(indentation*3, ' ')} {Name} (dir, size={Size})";
+        var print = $"{new string("~").PadLeft(indentation*3, ' ')} {Name} (dir, size={Size})";
         foreach (var c in Content.OrderBy(c => c.Name))
         {
             print += Environment.NewLine;

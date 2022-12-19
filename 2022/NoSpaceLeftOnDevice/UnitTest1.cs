@@ -8,11 +8,14 @@ public class Tests
     private static IEnumerable Example_test_data()
     {
         yield return new TestCaseData
-            (System.IO.File.ReadAllText("test.txt"));
+            (System.IO.File.ReadAllText("test.txt"), 48381165);
+        
+        yield return new TestCaseData
+            (System.IO.File.ReadAllText("input.txt"), 41412830);
     }
 
     [TestCaseSource(nameof(Example_test_data))]
-    public void Example(string terminalInput)
+    public void Example(string terminalInput, int size)
     {
         Assert.That(
             () =>
@@ -21,7 +24,7 @@ public class Tests
                 Console.WriteLine(mapFilesystem);
                 return mapFilesystem;
             },
-            Has.Property("Size").EqualTo(48381165));
+            Has.Property("Size").EqualTo(size));
     }
 
     private static Directory MapFilesystem(IEnumerable<string> commands)
